@@ -8,8 +8,9 @@ A minimal repository template that provides ready-to-use `.gitignore` files for 
 
 ```
 GameDevelopmentTemplate/
-├── README.md          ← You are here
+├── README.md              ← You are here
 ├── LICENSE
+├── .gitattributes         ← Git LFS tracking rules for binary assets
 └── Gitignores/
     ├── Unity.gitignore    ← Gitignore for Unity projects
     └── Unreal.gitignore   ← Gitignore for Unreal Engine projects
@@ -31,7 +32,60 @@ git clone https://github.com/<your-username>/<your-repo>.git
 cd <your-repo>
 ```
 
-### 3 — Paste your project files
+### 3 — Set up Git LFS
+
+> **Skip this step if you do not plan to store large or binary assets** (textures, audio, video, 3D models, etc.).  
+> The repo works perfectly fine without LFS for small projects.
+
+[Git LFS](https://git-lfs.github.com) replaces large binary files in your repository with lightweight text pointers, storing the actual file content on a separate server.  
+This keeps `git clone` fast and prevents the repository from ballooning in size.
+
+**a) Install Git LFS** (one-time, per machine):
+
+| Platform | Command |
+|---|---|
+| macOS (Homebrew) | `brew install git-lfs` |
+| Windows (winget) | `winget install GitHub.GitLFS` |
+| Ubuntu / Debian | `sudo apt install git-lfs` |
+| Other | Download from [git-lfs.github.com](https://git-lfs.github.com) |
+
+**b) Enable LFS in your shell** (one-time, per machine):
+
+```bash
+git lfs install
+```
+
+**c) Verify that `.gitattributes` is present**
+
+This template already includes a `.gitattributes` file at the root with LFS tracking rules for the most common game-dev binary formats (images, audio, video, 3D models, Unreal assets, and more).  
+Open it to review the tracked patterns, and add or remove entries to suit your project:
+
+```bash
+# Example: track an additional file type
+git lfs track "*.cubemap"
+# git lfs track writes to .gitattributes automatically
+```
+
+**d) Commit `.gitattributes`** (already done if you are using this template as-is):
+
+```bash
+git add .gitattributes
+git commit -m "Add Git LFS tracking rules"
+git push
+```
+
+**e) Cloning a repo that uses LFS**
+
+`git clone` fetches LFS pointers automatically when Git LFS is installed.  
+To pull LFS files into an existing clone that was checked out before LFS was set up:
+
+```bash
+git lfs pull
+```
+
+---
+
+### 4 — Paste your project files
 
 Copy (or move) the **contents** of your Unity or Unreal Engine project folder directly into the root of the cloned repository.  
 Your directory should look something like this after pasting:
@@ -61,7 +115,7 @@ Your directory should look something like this after pasting:
 └── README.md
 ```
 
-### 4 — Move the correct gitignore to the root
+### 5 — Move the correct gitignore to the root
 
 Pick the gitignore that matches your engine and move it to the root of the repository, renaming it to `.gitignore`.
 
@@ -75,7 +129,7 @@ mv Gitignores/Unity.gitignore .gitignore
 mv Gitignores/Unreal.gitignore .gitignore
 ```
 
-### 5 — Clean up
+### 6 — Clean up
 
 Delete the `Gitignores/` folder — you only need one gitignore and it is now in the right place.
 
@@ -83,7 +137,7 @@ Delete the `Gitignores/` folder — you only need one gitignore and it is now in
 rm -rf Gitignores/
 ```
 
-### 6 — Commit and push
+### 7 — Commit and push
 
 ```bash
 git add .
@@ -132,6 +186,42 @@ Here are the highlights of what is ignored and **why**:
 | `*.pak`, `*.ucas`, `*.utoc` | Cooked/packaged game data |
 | `*.pdb`, `*.lib`, `*.exp` | Live-coding helper files |
 | `.DS_Store`, `Thumbs.db` | OS-generated metadata files |
+
+---
+
+## Git LFS
+
+This template ships with a `.gitattributes` file that configures [Git LFS](https://git-lfs.github.com) for common game-development binary asset types.
+
+### Why Git LFS?
+
+Binary files (textures, audio clips, 3D models, video, etc.) are not efficiently stored by Git — even a single change to a large file adds the entire new copy to the repository history.  
+Git LFS stores those files on a dedicated server and keeps only a small text pointer in the repository, so:
+
+- `git clone` stays fast regardless of how many large assets you add over time.
+- Repository size on disk stays small for developers who only need the source code.
+- Binary diffs remain meaningful (LFS servers can show which files changed).
+
+### Tracked file types
+
+The included `.gitattributes` covers:
+
+| Category | Extensions |
+|---|---|
+| Images | `.png` `.jpg` `.jpeg` `.gif` `.bmp` `.tga` `.tiff` `.psd` `.exr` `.hdr` |
+| 3D Models & Animation | `.fbx` `.obj` `.blend` `.dae` `.3ds` `.abc` |
+| Audio | `.wav` `.mp3` `.ogg` `.aif` `.aiff` `.flac` |
+| Video | `.mp4` `.mov` `.avi` `.mkv` |
+| Fonts | `.ttf` `.otf` |
+| Unreal Engine assets | `.uasset` `.umap` |
+| Archives | `.zip` `.7z` `.rar` |
+
+To add more types, run `git lfs track "*.ext"` — it will append the new pattern to `.gitattributes` automatically.
+
+### LFS is optional
+
+Developers who do not need large asset storage can work with this template without installing Git LFS.  
+They will see LFS pointer files instead of the actual binary content for LFS-tracked files, but all source code and configuration remains fully accessible.
 
 ---
 
